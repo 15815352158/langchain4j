@@ -144,6 +144,9 @@
         <module>langchain4j-micrometer-metrics</module>
         <module>langchain4j-observation</module>
 
+        <!-- RF Copilot 桌面应用（射频工程师智能体） -->
+        <module>rf-desktop</module>
+
         <!-- integration tests -->
         <module>integration-tests</module>
 
