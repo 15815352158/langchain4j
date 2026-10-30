@@ -120,7 +120,6 @@ public class MainView extends BorderPane {
         header.getStyleClass().add("chat-header");
 
         chatBox.setPadding(new Insets(8, 24, 16, 24));
-        chatBox.setMaxWidth(900);
         scrollPane.setContent(chatBox);
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -418,11 +417,17 @@ public class MainView extends BorderPane {
         ta.setEditable(false);
         ta.setWrapText(true);
         ta.getStyleClass().addAll("msg", styleClass, "msg-ta");
-        ta.setMaxWidth(780);
+        // 回答/状态气泡铺满内容列宽度；用户提问气泡保留 780 上限靠右显示
+        if ("msg-user".equals(styleClass)) {
+            ta.setMaxWidth(780);
+        } else {
+            ta.setMaxWidth(Double.MAX_VALUE);
+        }
         ta.textProperty().addListener((o, a, b) -> autoGrow(ta));
         ta.widthProperty().addListener((o, a, b) -> autoGrow(ta));
         HBox row = new HBox(ta);
         row.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(ta, Priority.ALWAYS);
         chatBox.getChildren().add(row);
         autoGrow(ta);
         scrollToBottom();
