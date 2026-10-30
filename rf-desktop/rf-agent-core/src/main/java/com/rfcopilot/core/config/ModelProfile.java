@@ -15,6 +15,8 @@ public class ModelProfile {
     private String apiKey = "";
     private String modelName = "";
     private Double temperature;
+    /** 嵌入模型名（知识库 RAG 用），为空时按类型取默认值 */
+    private String embeddingModel;
 
     public ModelProfile() {
     }
@@ -90,5 +92,13 @@ public class ModelProfile {
 
     public void setTemperature(Double temperature) {
         this.temperature = temperature;
+    }
+
+    public String getEmbeddingModel() {
+        return embeddingModel;
+    }
+
+    public void setEmbeddingModel(String embeddingModel) {
+        this.embeddingModel = embeddingModel;
     }
 }

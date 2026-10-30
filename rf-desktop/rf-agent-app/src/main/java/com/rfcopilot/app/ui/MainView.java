@@ -7,7 +7,6 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -97,13 +96,7 @@ public class MainView extends BorderPane {
 
         Button kbBtn = new Button("知识库");
         kbBtn.setMaxWidth(Double.MAX_VALUE);
-        kbBtn.setOnAction(e -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("知识库");
-            alert.setHeaderText("知识库（RAG）功能开发中");
-            alert.setContentText("文档解析与向量检索将在 M4 里程碑提供。");
-            alert.showAndWait();
-        });
+        kbBtn.setOnAction(e -> openKnowledgeWindow());
 
         Button settingsBtn = new Button("设置");
         settingsBtn.setMaxWidth(Double.MAX_VALUE);
@@ -176,6 +169,7 @@ public class MainView extends BorderPane {
                 toolCard("S 参数解析与绘图", "Touchstone 文件 · 谐振点/带宽分析", this::openSParamWindow),
                 toolCard("链路预算计算", "FSPL · 接收功率 · 链路余量", this::openLinkBudgetWindow),
                 toolCard("日志分析", "规则预筛 · AI 异常定位与排查建议", this::openLogWindow),
+                toolCard("知识库 RAG", "收录文档 · 回答自动检索参考", this::openKnowledgeWindow),
                 placeholder("SCPI 仪表控制", "M5 里程碑提供（含人工确认）"));
         panel.getStyleClass().add("tool-panel");
         panel.setPadding(new Insets(16, 12, 16, 12));
@@ -207,6 +201,10 @@ public class MainView extends BorderPane {
 
     private void openLogWindow() {
         openToolWindow("日志分析", new LogView(ctx), 1080, 720);
+    }
+
+    private void openKnowledgeWindow() {
+        openToolWindow("知识库", new KnowledgeView(ctx, this::updateModelLabel), 860, 600);
     }
 
     private void openToolWindow(String name, javafx.scene.Parent content, double w, double h) {
@@ -379,6 +377,8 @@ public class MainView extends BorderPane {
     }
 
     private void updateModelLabel() {
-        headerModel.setText("当前模型：" + ctx.activeProfileName());
+        int kbCount = ctx.getKnowledgeBase().entries().size();
+        String kbPart = kbCount == 0 ? "知识库未启用" : "知识库已启用（" + kbCount + " 篇）";
+        headerModel.setText("当前模型：" + ctx.activeProfileName() + "　·　" + kbPart);
     }
 }

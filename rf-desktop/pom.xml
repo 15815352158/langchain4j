@@ -21,6 +21,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- langchain4j 走本地 reactor 源码构建 -->
         <langchain4j.version>1.24.0-SNAPSHOT</langchain4j.version>
+        <!-- 文档解析器模块为 beta 版本段 -->
+        <langchain4j.beta.version>1.24.0-beta34-SNAPSHOT</langchain4j.beta.version>
         <javafx.version>25.0.5</javafx.version>
         <jackson.version>2.22.4</jackson.version>
         <slf4j.version>2.0.18</slf4j.version>
@@ -47,6 +49,21 @@
                 <groupId>dev.langchain4j</groupId>
                 <artifactId>langchain4j-ollama</artifactId>
                 <version>${langchain4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-document-parser-apache-pdfbox</artifactId>
+                <version>${langchain4j.beta.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-document-parser-apache-poi</artifactId>
+                <version>${langchain4j.beta.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-document-parser-markdown</artifactId>
+                <version>${langchain4j.beta.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>

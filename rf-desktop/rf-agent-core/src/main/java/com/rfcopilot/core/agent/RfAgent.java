@@ -11,6 +11,7 @@ import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.StreamingChatModel;
+import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.TokenStream;
 
@@ -27,11 +28,19 @@ public class RfAgent {
         this.assistant = assistant;
     }
 
+    /** 不启用知识库的创建方式 */
+    public static RfAgent create(ModelProfile profile, SessionStore sessionStore) {
+        return create(profile, sessionStore, null);
+    }
+
     /**
      * 创建智能体。记忆按 sessionId 隔离，并从会话存储回填历史，
      * 保证应用重启后上下文连续。
+     *
+     * @param contentRetriever 知识库检索器；为 null 时不启用 RAG
      */
-    public static RfAgent create(ModelProfile profile, SessionStore sessionStore) {
+    public static RfAgent create(ModelProfile profile, SessionStore sessionStore,
+                                 ContentRetriever contentRetriever) {
         StreamingChatModel model = ChatModelFactory.createStreaming(profile);
         ChatMemoryProvider memoryProvider = memoryId -> {
             ChatMemory memory = MessageWindowChatMemory.withMaxMessages(MAX_MEMORY_MESSAGES);
@@ -47,10 +56,13 @@ public class RfAgent {
             }
             return memory;
         };
-        RfAssistant assistant = AiServices.builder(RfAssistant.class)
+        AiServices<RfAssistant> builder = AiServices.builder(RfAssistant.class)
                 .streamingChatModel(model)
-                .chatMemoryProvider(memoryProvider)
-                .build();
+                .chatMemoryProvider(memoryProvider);
+        if (contentRetriever != null) {
+            builder.contentRetriever(contentRetriever);
+        }
+        RfAssistant assistant = builder.build();
         return new RfAgent(assistant);
     }
 
