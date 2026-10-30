@@ -97,7 +97,14 @@ public class SettingsDialog extends Dialog<Void> {
         typeCombo.setConverter(new javafx.util.StringConverter<>() {
             @Override
             public String toString(ModelType t) {
-                return t == null ? "" : (t == ModelType.OPENAI_COMPATIBLE ? "云端（OpenAI 兼容）" : "本地 Ollama");
+                if (t == null) {
+                    return "";
+                }
+                return switch (t) {
+                    case OPENAI_COMPATIBLE -> "云端（OpenAI 兼容）";
+                    case OLLAMA -> "本地 Ollama";
+                    case BUILTIN_ONNX -> "内置离线（ONNX，仅嵌入）";
+                };
             }
 
             @Override
@@ -122,7 +129,7 @@ public class SettingsDialog extends Dialog<Void> {
         embeddingModelField.setPromptText("知识库 RAG 用；留空取默认（如 text-embedding-3-small / nomic-embed-text）");
         grid.addRow(r, new Label("KB嵌入档位："), embeddingProfileCombo);
         embeddingProfileCombo.setMaxWidth(Double.MAX_VALUE);
-        embeddingProfileCombo.setPromptText("知识库向量嵌入使用哪个档位（聊天档位不受影响）");
+        embeddingProfileCombo.setPromptText("知识库向量嵌入使用哪个档位（默认内置离线，聊天档位不受影响）");
         baseUrlField.setPrefColumnCount(38);
         apiKeyField.setPrefColumnCount(38);
         return grid;
@@ -143,10 +150,10 @@ public class SettingsDialog extends Dialog<Void> {
         });
     }
 
-    /** 重建"知识库嵌入档位"下拉框：第 0 项为跟随当前档位 */
+    /** 重建"知识库嵌入档位"下拉框：第 0 项为默认（内置离线嵌入） */
     private void refreshEmbeddingProfileCombo() {
         String currentId = ctx.getConfig().getEmbeddingProfileId();
-        embeddingProfileCombo.getItems().setAll("跟随当前档位");
+        embeddingProfileCombo.getItems().setAll("默认（内置离线嵌入，免配置）");
         for (ModelProfile p : ctx.getConfig().getProfiles()) {
             embeddingProfileCombo.getItems().add(p.displayName());
         }

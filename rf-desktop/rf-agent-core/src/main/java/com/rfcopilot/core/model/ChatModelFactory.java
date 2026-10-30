@@ -40,6 +40,9 @@ public final class ChatModelFactory {
                 }
                 yield builder.build();
             }
+            // 内置档位只做知识库嵌入，不能当对话模型
+            case BUILTIN_ONNX -> throw new IllegalArgumentException(
+                    "「内置离线嵌入」档位仅供知识库使用，对话请选择云端或 Ollama 档位");
         };
     }
 }

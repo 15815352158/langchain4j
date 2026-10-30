@@ -33,7 +33,16 @@ public class ConfigStore {
             save(defaults);
             return defaults;
         }
-        return mapper.readValue(Files.readAllBytes(file), AppConfig.class);
+        AppConfig config = mapper.readValue(Files.readAllBytes(file), AppConfig.class);
+        // 老配置自动补充内置离线嵌入档位
+        boolean hasBuiltin = config.getProfiles().stream()
+                .anyMatch(p -> p.getType() == ModelType.BUILTIN_ONNX);
+        if (!hasBuiltin) {
+            config.getProfiles().add(new ModelProfile(
+                    "内置离线嵌入", ModelType.BUILTIN_ONNX, "", "", "bge-small-zh-v1.5", null));
+            save(config);
+        }
+        return config;
     }
 
     public void save(AppConfig config) throws IOException {

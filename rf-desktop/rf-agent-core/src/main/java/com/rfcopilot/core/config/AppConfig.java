@@ -25,8 +25,11 @@ public class AppConfig {
         ModelProfile cloud = new ModelProfile(
                 "云端（OpenAI 兼容）", ModelType.OPENAI_COMPATIBLE, "https://api.openai.com/v1", "", "gpt-4o-mini", 0.3);
         cloud.setEmbeddingModel("text-embedding-3-small");
+        ModelProfile builtin = new ModelProfile(
+                "内置离线嵌入", ModelType.BUILTIN_ONNX, "", "", "bge-small-zh-v1.5", null);
         config.getProfiles().add(cloud);
         config.getProfiles().add(ollama);
+        config.getProfiles().add(builtin);
         config.setActiveProfileId(cloud.getId());
         return config;
     }
@@ -42,7 +45,7 @@ public class AppConfig {
                 .orElse(profiles.get(0));
     }
 
-    /** 知识库嵌入档位；未设置或对应档位已删除时回退到当前激活档位 */
+    /** 知识库嵌入档位；未设置时默认用内置离线嵌入档位，没有内置档位才跟随当前激活档位 */
     public ModelProfile embeddingProfile() {
         if (embeddingProfileId != null && !embeddingProfileId.isBlank()) {
             ModelProfile p = profiles.stream()
@@ -53,7 +56,10 @@ public class AppConfig {
                 return p;
             }
         }
-        return activeProfile();
+        return profiles.stream()
+                .filter(p -> p.getType() == ModelType.BUILTIN_ONNX)
+                .findFirst()
+                .orElseGet(this::activeProfile);
     }
 
     public String getActiveProfileId() {

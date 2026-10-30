@@ -39,11 +39,16 @@ public final class EmbeddingModelFactory {
                     .modelName(blank ? DEFAULT_OLLAMA_EMBEDDING : modelName.strip())
                     .timeout(Duration.ofSeconds(60))
                     .build();
+            // 内置离线：进程内 ONNX，单例复用
+            case BUILTIN_ONNX -> OnnxEmbeddingModel.getInstance();
         };
     }
 
     /** 实际生效的嵌入模型名（用于界面展示） */
     public static String effectiveModelName(ModelProfile profile) {
+        if (profile.getType() == com.rfcopilot.core.config.ModelType.BUILTIN_ONNX) {
+            return "bge-small-zh-v1.5（内置离线）";
+        }
         String modelName = profile.getEmbeddingModel();
         if (modelName != null && !modelName.isBlank()) {
             return modelName.strip();
