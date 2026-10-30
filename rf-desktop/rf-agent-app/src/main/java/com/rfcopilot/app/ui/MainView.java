@@ -148,10 +148,13 @@ public class MainView extends BorderPane {
 
         sendButton.getStyleClass().add("send-btn");
         sendButton.setOnAction(e -> send());
-        // 输入框独占整行（右边到垂直滚动条），发送按钮在其下方右对齐
-        HBox btnRow = new HBox(sendButton);
-        btnRow.setAlignment(Pos.TOP_RIGHT);
-        VBox inputCol = new VBox(8, inputArea, btnRow);
+        // 输入框与发送按钮同行：输入框占满整行，按钮在右侧且与输入框等高
+        HBox inputRow = new HBox(8, inputArea, sendButton);
+        HBox.setHgrow(inputArea, Priority.ALWAYS);
+        sendButton.setMinWidth(88);
+        sendButton.setPrefWidth(88);
+        sendButton.maxHeightProperty().bind(inputRow.heightProperty());
+        VBox inputCol = new VBox(inputRow);
         inputCol.setPadding(new Insets(10, 24, 16, 24));
 
         VBox center = new VBox(header, scrollPane, inputCol);

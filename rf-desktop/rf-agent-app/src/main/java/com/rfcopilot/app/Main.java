@@ -24,7 +24,11 @@ public class Main extends Application {
 
         MainView view = new MainView(ctx);
         BorderPane root = new BorderPane(view);
-        Scene scene = new Scene(root, 1280, 820);
+        // 按屏幕可视区域自适应：最大 1280x820，小屏取可视区 92%，保证不超出屏幕
+        var vb = javafx.stage.Screen.getPrimary().getVisualBounds();
+        double w = Math.min(1280, vb.getWidth() * 0.8);
+        double h = Math.min(820, vb.getHeight() * 0.8);
+        Scene scene = new Scene(root, w, h);
         ThemeManager.apply(scene);
         root.setTop(buildMenuBar(ctx, scene));
 
@@ -33,8 +37,11 @@ public class Main extends Application {
         if (icon != null) {
             stage.getIcons().add(new javafx.scene.image.Image(icon.toExternalForm()));
         }
-        stage.setMinWidth(960);
-        stage.setMinHeight(640);
+        stage.setMinWidth(Math.min(960, w));
+        stage.setMinHeight(Math.min(640, h));
+        // 窗口居中显示
+        stage.setX(vb.getMinX() + (vb.getWidth() - w) / 2);
+        stage.setY(vb.getMinY() + (vb.getHeight() - h) / 2);
         stage.setScene(scene);
         stage.show();
     }
