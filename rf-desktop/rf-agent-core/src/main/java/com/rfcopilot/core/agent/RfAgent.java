@@ -28,9 +28,15 @@ public class RfAgent {
         this.assistant = assistant;
     }
 
-    /** 不启用知识库的创建方式 */
+    /** 不启用知识库与工具的创建方式 */
     public static RfAgent create(ModelProfile profile, SessionStore sessionStore) {
-        return create(profile, sessionStore, null);
+        return create(profile, sessionStore, null, null);
+    }
+
+    /** 仅启用知识库 RAG 的创建方式 */
+    public static RfAgent create(ModelProfile profile, SessionStore sessionStore,
+                                 ContentRetriever contentRetriever) {
+        return create(profile, sessionStore, contentRetriever, null);
     }
 
     /**
@@ -38,9 +44,10 @@ public class RfAgent {
      * 保证应用重启后上下文连续。
      *
      * @param contentRetriever 知识库检索器；为 null 时不启用 RAG
+     * @param tools            工具对象（带 @Tool 注解方法）；为 null 时不启用工具调用
      */
     public static RfAgent create(ModelProfile profile, SessionStore sessionStore,
-                                 ContentRetriever contentRetriever) {
+                                 ContentRetriever contentRetriever, Object tools) {
         StreamingChatModel model = ChatModelFactory.createStreaming(profile);
         ChatMemoryProvider memoryProvider = memoryId -> {
             ChatMemory memory = MessageWindowChatMemory.withMaxMessages(MAX_MEMORY_MESSAGES);
@@ -61,6 +68,9 @@ public class RfAgent {
                 .chatMemoryProvider(memoryProvider);
         if (contentRetriever != null) {
             builder.contentRetriever(contentRetriever);
+        }
+        if (tools != null) {
+            builder.tools(tools);
         }
         RfAssistant assistant = builder.build();
         return new RfAgent(assistant);

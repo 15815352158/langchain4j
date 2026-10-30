@@ -18,6 +18,8 @@
 
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
+        <!-- 保留方法参数名供 langchain4j 工具调用使用 -->
+        <maven.compiler.parameters>true</maven.compiler.parameters>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- langchain4j 走本地 reactor 源码构建 -->
         <langchain4j.version>1.24.0-SNAPSHOT</langchain4j.version>

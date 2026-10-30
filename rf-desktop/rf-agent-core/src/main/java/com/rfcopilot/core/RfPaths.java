@@ -27,6 +27,10 @@ public final class RfPaths {
         return BASE.resolve("knowledge");
     }
 
+    public static Path scpiConfigFile() {
+        return BASE.resolve("scpi.json");
+    }
+
     /** 确保数据目录存在 */
     public static void ensureDirs() throws IOException {
         Files.createDirectories(BASE);

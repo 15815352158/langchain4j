@@ -170,7 +170,7 @@ public class MainView extends BorderPane {
                 toolCard("链路预算计算", "FSPL · 接收功率 · 链路余量", this::openLinkBudgetWindow),
                 toolCard("日志分析", "规则预筛 · AI 异常定位与排查建议", this::openLogWindow),
                 toolCard("知识库 RAG", "收录文档 · 回答自动检索参考", this::openKnowledgeWindow),
-                placeholder("SCPI 仪表控制", "M5 里程碑提供（含人工确认）"));
+                toolCard("SCPI 仪表控制", "TCP 直连 · 命令终端 · AI 操作需人工确认", this::openScpiWindow));
         panel.getStyleClass().add("tool-panel");
         panel.setPadding(new Insets(16, 12, 16, 12));
         panel.setMinWidth(240);
@@ -207,6 +207,10 @@ public class MainView extends BorderPane {
         openToolWindow("知识库", new KnowledgeView(ctx, this::updateModelLabel), 860, 600);
     }
 
+    private void openScpiWindow() {
+        openToolWindow("SCPI 仪表控制", new ScpiView(ctx), 920, 620);
+    }
+
     private void openToolWindow(String name, javafx.scene.Parent content, double w, double h) {
         javafx.stage.Stage stage = new javafx.stage.Stage();
         stage.initOwner(getScene().getWindow());
@@ -216,17 +220,6 @@ public class MainView extends BorderPane {
                 Objects.requireNonNull(getClass().getResource("/styles.css")).toExternalForm());
         stage.setScene(scene);
         stage.show();
-    }
-
-    private VBox placeholder(String name, String note) {
-        Label l1 = new Label(name);
-        l1.getStyleClass().add("tool-name");
-        Label l2 = new Label(note);
-        l2.getStyleClass().add("tool-note");
-        l2.setWrapText(true);
-        VBox box = new VBox(4, l1, l2);
-        box.getStyleClass().add("tool-card");
-        return box;
     }
 
     // ---------- 会话操作 ----------
