@@ -199,6 +199,13 @@
     -fx-padding: 8;
 }
 
+/* 链路预算结果滚动区：透明底，融入深色主题 */
+.link-result-scroll,
+.link-result-scroll > .viewport {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
 /* SCPI 快捷命令按钮（深色背景，避免浅字浅底） */
 .quick-btn {
     -fx-background-color: #2a2a2a;

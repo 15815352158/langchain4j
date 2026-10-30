@@ -3,8 +3,10 @@ package com.rfcopilot.app.ui;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 /**
@@ -44,9 +46,21 @@ public class LinkBudgetView extends VBox {
         result.setWrapText(true);
         result.getStyleClass().add("msg");
         result.setStyle("-fx-padding: 14; -fx-font-size: 14px;");
+        result.setMaxWidth(Double.MAX_VALUE);
+
+        // 结果区：默认占满剩余空间（右/下随窗口 20px 内边距对齐），内容超高时出垂直滚动条
+        ScrollPane resultScroll = new ScrollPane(result);
+        resultScroll.getStyleClass().add("link-result-scroll");
+        // 水平：内容始终撑满可视区宽度（与输入框同宽）；垂直：不压缩，放不下才出滚动条
+        resultScroll.setFitToWidth(true);
+        resultScroll.setFitToHeight(false);
+        resultScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        resultScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        resultScroll.setPrefHeight(160);
+        VBox.setVgrow(resultScroll, Priority.ALWAYS);
 
         getChildren().addAll(new Label("自由空间链路预算（FSPL = 32.44 + 20·log₁₀f[MHz] + 20·log₁₀d[km]）"),
-                grid, calc, result);
+                grid, calc, resultScroll);
     }
 
     private TextField num(String def, String prompt) {
