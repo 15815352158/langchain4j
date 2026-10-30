@@ -46,6 +46,7 @@ public class Main extends Application {
             item.setOnAction(e -> {
                 ThemeManager.set(t);
                 ThemeManager.apply(scene);
+                com.rfcopilot.app.ui.MarkdownBubble.rerenderAll();
                 ctx.getConfig().setTheme(t.name());
                 try {
                     ctx.getConfigStore().save(ctx.getConfig());

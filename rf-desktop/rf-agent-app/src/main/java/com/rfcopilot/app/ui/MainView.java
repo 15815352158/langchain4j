@@ -353,7 +353,7 @@ public class MainView extends BorderPane {
         addBubble("msg-user", text);
         inputArea.clear();
 
-        var assistantBubble = addBubble("msg-assistant", "思考中…");
+        var assistantBubble = addMarkdownBubble();
         StringBuilder sb = new StringBuilder();
         streaming = true;
         sendButton.setDisable(true);
@@ -364,14 +364,14 @@ public class MainView extends BorderPane {
             ctx.getAgent().chat(session.getId(), text)
                     .onPartialResponse(token -> Platform.runLater(() -> {
                         sb.append(token);
-                        assistantBubble.setText(sb.toString());
+                        assistantBubble.setMarkdown(sb.toString());
                         scrollToBottom();
                     }))
                     .onCompleteResponse(response -> Platform.runLater(() -> {
                         String finalText = !sb.isEmpty()
                                 ? sb.toString()
                                 : (response.aiMessage() != null ? response.aiMessage().text() : "");
-                        assistantBubble.setText(finalText);
+                        assistantBubble.setMarkdownNow(finalText);
                         session.getMessages().add(new ChatMessageDto(
                                 ChatMessageDto.ROLE_ASSISTANT, finalText, LocalDateTime.now().format(FMT)));
                         try {
@@ -385,18 +385,28 @@ public class MainView extends BorderPane {
                         }
                     }))
                     .onError(err -> Platform.runLater(() -> {
-                        assistantBubble.getStyleClass().remove("msg-assistant");
-                        assistantBubble.getStyleClass().add("msg-error");
-                        assistantBubble.setText("请求失败：" + err.getMessage());
+                        assistantBubble.setErrorStyle(true);
+                        assistantBubble.setMarkdownNow("请求失败：" + err.getMessage());
                         endStreaming();
                     }))
                     .start();
         } catch (Exception e) {
-            assistantBubble.getStyleClass().remove("msg-assistant");
-            assistantBubble.getStyleClass().add("msg-error");
-            assistantBubble.setText("请求失败：" + e.getMessage());
+            assistantBubble.setErrorStyle(true);
+            assistantBubble.setMarkdownNow("请求失败：" + e.getMessage());
             endStreaming();
         }
+    }
+
+    /** AI 回答气泡：Markdown 渲染（WebView），支持选中复制 */
+    private MarkdownBubble addMarkdownBubble() {
+        MarkdownBubble mb = new MarkdownBubble();
+        HBox row = new HBox(mb);
+        row.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(mb, javafx.scene.layout.Priority.ALWAYS);
+        chatBox.getChildren().add(row);
+        mb.setMarkdownNow("思考中…");
+        scrollToBottom();
+        return mb;
     }
 
     private void showSaveWarning() {
