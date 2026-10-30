@@ -15,6 +15,7 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -42,8 +43,11 @@ public class LogView extends BorderPane {
     public LogView(AppContext ctx) {
         this.ctx = ctx;
         setTop(buildToolbar());
-        setCenter(buildTable());
-        setBottom(buildResultArea());
+        // 可拖拽分隔条：命中记录区与 AI 分析区此消彼长
+        SplitPane split = new SplitPane(buildTable(), buildResultArea());
+        split.setOrientation(javafx.geometry.Orientation.VERTICAL);
+        split.setDividerPositions(0.55);
+        setCenter(split);
     }
 
     private HBox buildToolbar() {
@@ -96,6 +100,7 @@ public class LogView extends BorderPane {
         aiResult.getStyleClass().add("input-area");
         VBox box = new VBox(6, title, aiResult);
         box.setPadding(new Insets(4, 16, 12, 16));
+        VBox.setVgrow(aiResult, Priority.ALWAYS);
         return box;
     }
 

@@ -17,7 +17,8 @@ import java.util.regex.Pattern;
 
 /**
  * 通用日志规则预筛引擎：错误/警告/失败关键词、SCPI 错误码、十六进制错误码、
- * 超时、异常时间窗聚类。自动识别 UTF-8 / GBK 编码。
+ * 超时、异常时间窗聚类；并内置射频产测（Tx/Rx 校准与检测）专用规则与阶段判定。
+ * 自动识别 UTF-8 / GBK 编码。
  */
 public final class LogScanner {
 
@@ -34,6 +35,10 @@ public final class LogScanner {
                     Pattern.compile("\\b(ERROR|FATAL|CRITICAL|EXCEPTION)\\b|错误|严重|异常", Pattern.CASE_INSENSITIVE)),
             new Rule("WARN", "警告关键词",
                     Pattern.compile("\\bWARN(ING)?\\b|警告", Pattern.CASE_INSENSITIVE)),
+            new Rule("FAIL", "校准/检测失败项",
+                    Pattern.compile("(功率|频偏|IQ|RSSI|直流偏移|正交|灵敏度|EVM|杂散|底噪|模板|带宽|丢包|PER|帧同步|时序)[^\\n]{0,24}(FAIL|失败|不过|超差|超限|不合格|未通过|不收敛|未收敛|超窗口)|(FAIL|失败|超差)[^\\n]{0,24}(功率|频偏|IQ|RSSI|灵敏度|EVM)", Pattern.CASE_INSENSITIVE)),
+            new Rule("PARAM", "校准参数读数",
+                    Pattern.compile("(链路损耗|补偿值|基准功率|目标功率|增益码|增益档位|增益不平衡|偏置电压|迭代|收敛|步长|阈值|温度补偿|检波|晶振|负载电容|时基|环路|分频|FTUNE|DAC|PLL|RSSI|EVM|底噪|杂散|灵敏度|模板|占用带宽|丢包|PER|频偏|IQ|直流偏移|正交|信道|MCS|burst|积分时间|等待延时|平均次数)[^\\n]{0,18}[:：=]\\s*-?\\d[\\d.eE+-]*", Pattern.CASE_INSENSITIVE)),
             new Rule("FAIL", "失败/超限",
                     Pattern.compile("\\bFAIL(ED)?\\b|不通过|超限|out of limit|校验失败", Pattern.CASE_INSENSITIVE)),
             new Rule("TIMEOUT", "超时",
@@ -90,7 +95,49 @@ public final class LogScanner {
         }
 
         detectBursts(result, errorSeconds);
+        detectStages(result);
         return result;
+    }
+
+    /** 射频产测阶段判定：把 FAIL/ERROR 命中行归入 Tx/Rx 的校准或检测阶段 */
+    private static final Pattern STAGE_TX_CAL = Pattern.compile(
+            "(发射)?功率校准|频偏校准|IQ\\s*校准|直流偏移校准|(校准.{0,12}(FAIL|失败|超差|不收敛)|不收敛|未收敛)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern STAGE_TX_DET = Pattern.compile(
+            "EVM|频谱模板|杂散|功率稳定度|占用带宽|发包计数|发射时序|功率复测|频偏复测|丢包率?|PER", Pattern.CASE_INSENSITIVE);
+    private static final Pattern STAGE_RX_CAL = Pattern.compile(
+            "RSSI\\s*校准|接收直流偏移|接收IQ|RX.{0,6}(DC|IQ)\\s*校准", Pattern.CASE_INSENSITIVE);
+    private static final Pattern STAGE_RX_DET = Pattern.compile(
+            "灵敏度|收包|RSSI\\s*精度|底噪|邻道|最大输入|帧同步", Pattern.CASE_INSENSITIVE);
+
+    private static void detectStages(LogScanResult result) {
+        int txCal = 0, txDet = 0, rxCal = 0, rxDet = 0;
+        for (LogFinding f : result.findings()) {
+            if (!"FAIL".equals(f.level()) && !"ERROR".equals(f.level())) {
+                continue;
+            }
+            String t = f.text();
+            if (STAGE_RX_CAL.matcher(t).find()) {
+                rxCal++;
+            } else if (STAGE_TX_CAL.matcher(t).find()) {
+                txCal++;
+            } else if (STAGE_RX_DET.matcher(t).find()) {
+                rxDet++;
+            } else if (STAGE_TX_DET.matcher(t).find()) {
+                txDet++;
+            }
+        }
+        if (txCal > 0) {
+            result.addCluster("阶段判定：Tx 校准阶段失败 " + txCal + " 条（功率/频偏/IQ 校准不过，属校准收敛或超差问题）");
+        }
+        if (txDet > 0) {
+            result.addCluster("阶段判定：Tx 发包检测阶段失败 " + txDet + " 条（EVM/模板/杂散/复测等，属发包检测不合格）");
+        }
+        if (rxCal > 0) {
+            result.addCluster("阶段判定：Rx 校准阶段失败 " + rxCal + " 条（RSSI/直流偏移/接收 IQ 校准不过）");
+        }
+        if (rxDet > 0) {
+            result.addCluster("阶段判定：Rx 接收检测阶段失败 " + rxDet + " 条（灵敏度/PER/底噪/帧同步等，属收包检测不合格）");
+        }
     }
 
     /** 60 秒窗口内错误 ≥5 视为异常爆发时间窗 */
