@@ -400,6 +400,7 @@ public class MainView extends BorderPane {
     /** AI 回答气泡：Markdown 渲染（WebView），支持选中复制 */
     private MarkdownBubble addMarkdownBubble() {
         MarkdownBubble mb = new MarkdownBubble();
+        forwardWheel(mb);
         HBox row = new HBox(mb);
         row.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(mb, javafx.scene.layout.Priority.ALWAYS);
@@ -407,6 +408,27 @@ public class MainView extends BorderPane {
         mb.setMarkdownNow("思考中…");
         scrollToBottom();
         return mb;
+    }
+
+    /**
+     * 滚轮事件转发：TextArea/WebView 气泡会吞掉滚轮事件，
+     * 用事件过滤器拦截后手动滚动外层 ScrollPane。
+     */
+    private void forwardWheel(javafx.scene.Node bubble) {
+        bubble.addEventFilter(javafx.scene.input.ScrollEvent.SCROLL, e -> {
+            double dy = e.getDeltaY();
+            if (dy == 0) {
+                return;
+            }
+            e.consume();
+            double contentH = chatBox.prefHeight(scrollPane.getWidth());
+            double viewH = scrollPane.getViewportBounds().getHeight();
+            if (contentH <= viewH) {
+                return;
+            }
+            double v = scrollPane.getVvalue() - dy * 40.0 / (contentH - viewH);
+            scrollPane.setVvalue(Math.min(scrollPane.getVmax(), Math.max(scrollPane.getVmin(), v)));
+        });
     }
 
     private void showSaveWarning() {
@@ -427,6 +449,7 @@ public class MainView extends BorderPane {
         ta.setEditable(false);
         ta.setWrapText(true);
         ta.getStyleClass().addAll("msg", styleClass, "msg-ta");
+        forwardWheel(ta);
         // 回答/状态气泡铺满内容列宽度；用户提问气泡保留 780 上限靠右显示
         if ("msg-user".equals(styleClass)) {
             ta.setMaxWidth(780);
