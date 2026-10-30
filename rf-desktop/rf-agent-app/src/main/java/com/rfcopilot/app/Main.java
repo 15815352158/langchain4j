@@ -28,7 +28,11 @@ public class Main extends Application {
         ThemeManager.apply(scene);
         root.setTop(buildMenuBar(ctx, scene));
 
-        stage.setTitle("RF Copilot · 射频工程师智能助手");
+        stage.setTitle("RF Copilot · 射频工程师智能助手 V1.0");
+        var icon = Main.class.getResource("/app-icon.png");
+        if (icon != null) {
+            stage.getIcons().add(new javafx.scene.image.Image(icon.toExternalForm()));
+        }
         stage.setMinWidth(960);
         stage.setMinHeight(640);
         stage.setScene(scene);

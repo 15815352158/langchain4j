@@ -286,6 +286,10 @@ public class MainView extends BorderPane {
         javafx.stage.Stage stage = new javafx.stage.Stage();
         stage.initOwner(getScene().getWindow());
         stage.setTitle(name + " · RF Copilot");
+        var icon = MainView.class.getResource("/app-icon.png");
+        if (icon != null) {
+            stage.getIcons().add(new javafx.scene.image.Image(icon.toExternalForm()));
+        }
         javafx.scene.Scene scene = new javafx.scene.Scene(content, w, h);
         com.rfcopilot.app.ThemeManager.apply(scene);
         stage.setScene(scene);
