@@ -42,6 +42,16 @@ public class MarkdownBubble extends StackPane {
     private String raw = "";
     private boolean errorStyle;
     private final PauseTransition debounce = new PauseTransition(Duration.millis(120));
+    /** 当前打开的快捷菜单（全局唯一，防止 WebView 内点击不触发弹层自动关闭导致残留） */
+    private static javafx.scene.control.ContextMenu openMenu;
+
+    private static void hideOpenMenu() {
+        if (openMenu != null) {
+            javafx.scene.control.ContextMenu m = openMenu;
+            openMenu = null;
+            m.hide();
+        }
+    }
 
     public MarkdownBubble() {
         setMaxWidth(Double.MAX_VALUE);
@@ -53,10 +63,59 @@ public class MarkdownBubble extends StackPane {
                 measure();
             }
         });
+        web.setContextMenuEnabled(false);
         web.widthProperty().addListener((o, a, b) -> measure());
         debounce.setOnFinished(e -> doRender());
+        // WebView 吞掉鼠标事件导致弹层"点外部自动关闭"失效：
+        // 任何鼠标按下先关闭上一个残留的快捷菜单
+        addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, e -> hideOpenMenu());
+        web.setOnContextMenuRequested(e -> {
+            hideOpenMenu();
+            javafx.scene.control.MenuItem copySel = new javafx.scene.control.MenuItem("复制选中内容");
+            copySel.setOnAction(x -> {
+                String t = selectedText();
+                if (!t.isBlank()) {
+                    copyToClipboard(t);
+                }
+            });
+            javafx.scene.control.MenuItem copyRaw =
+                    new javafx.scene.control.MenuItem("复制原始内容");
+            copyRaw.setOnAction(x -> copyToClipboard(raw));
+            javafx.scene.control.ContextMenu menu =
+                    new javafx.scene.control.ContextMenu(copySel, copyRaw);
+            // 弹层叠在 WebView 上时点击会被其原生表面抢走：
+            // 菜单显示期间禁用 WebView，保证点击落在菜单项上并能正常关闭
+            menu.setOnShowing(x -> web.setDisable(true));
+            menu.setOnHidden(x -> {
+                web.setDisable(false);
+                if (openMenu == menu) {
+                    openMenu = null;
+                }
+            });
+            openMenu = menu;
+            menu.show(this, e.getScreenX(), e.getScreenY());
+            e.consume();
+        });
         getChildren().add(web);
         ALL.add(this);
+    }
+
+    private void copyToClipboard(String text) {
+        javafx.scene.input.Clipboard.getSystemClipboard().setContent(java.util.Map.of(
+                javafx.scene.input.DataFormat.PLAIN_TEXT, text));
+    }
+
+    /** 取 WebView 当前选中文本（JavaFX 25 无公开 API，反射内部 WebPage） */
+    private String selectedText() {
+        try {
+            var m = javafx.scene.web.WebEngine.class.getDeclaredMethod("getPage");
+            m.setAccessible(true);
+            com.sun.webkit.WebPage p = (com.sun.webkit.WebPage) m.invoke(web.getEngine());
+            String s = p.getClientSelectedText();
+            return s == null ? "" : s;
+        } catch (Throwable t) {
+            return "";
+        }
     }
 
     /** 流式增量更新：120ms 防抖合并，避免每个 token 重渲染 */

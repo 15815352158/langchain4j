@@ -312,8 +312,12 @@ public class MainView extends BorderPane {
         headerTitle.setText(session.getTitle());
         chatBox.getChildren().clear();
         for (ChatMessageDto dto : session.getMessages()) {
-            addBubble(ChatMessageDto.ROLE_USER.equals(dto.getRole()) ? "msg-user" : "msg-assistant",
-                    dto.getText());
+            if (ChatMessageDto.ROLE_USER.equals(dto.getRole())) {
+                addBubble("msg-user", dto.getText());
+            } else {
+                MarkdownBubble mb = addMarkdownBubble();
+                mb.setMarkdownNow(dto.getText());
+            }
         }
         scrollToBottom();
     }
