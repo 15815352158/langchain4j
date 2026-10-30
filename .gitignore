@@ -1,4 +1,6 @@
 target/
+*.log
+rf-desktop/dist/
 **/.flattened-pom.xml
 
 ### IntelliJ IDEA ###
