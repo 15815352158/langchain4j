@@ -22,6 +22,7 @@ import javafx.scene.layout.VBox;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 /**
  * 主界面：仿 Codex 桌面版布局（左侧栏 / 中央对话区 / 右侧工具面板占位），全中文。
@@ -172,15 +173,51 @@ public class MainView extends BorderPane {
         Label title = new Label("工具面板");
         title.getStyleClass().add("section-title");
         VBox panel = new VBox(10, title,
-                placeholder("S 参数解析与绘图", "M2 里程碑提供"),
-                placeholder("日志分析", "M3 里程碑提供"),
-                placeholder("链路预算计算", "M2 里程碑提供"),
+                toolCard("S 参数解析与绘图", "Touchstone 文件 · 谐振点/带宽分析", this::openSParamWindow),
+                toolCard("链路预算计算", "FSPL · 接收功率 · 链路余量", this::openLinkBudgetWindow),
+                toolCard("日志分析", "规则预筛 · AI 异常定位与排查建议", this::openLogWindow),
                 placeholder("SCPI 仪表控制", "M5 里程碑提供（含人工确认）"));
         panel.getStyleClass().add("tool-panel");
         panel.setPadding(new Insets(16, 12, 16, 12));
         panel.setMinWidth(240);
         panel.setPrefWidth(260);
         return panel;
+    }
+
+    private VBox toolCard(String name, String note, Runnable action) {
+        Label l1 = new Label(name);
+        l1.getStyleClass().add("tool-name");
+        Label l2 = new Label(note);
+        l2.getStyleClass().add("tool-note");
+        l2.setWrapText(true);
+        Button open = new Button("打开");
+        open.setOnAction(e -> action.run());
+        VBox box = new VBox(6, l1, l2, open);
+        box.getStyleClass().add("tool-card");
+        return box;
+    }
+
+    private void openSParamWindow() {
+        openToolWindow("S 参数解析与绘图", new SParamView(), 1000, 680);
+    }
+
+    private void openLinkBudgetWindow() {
+        openToolWindow("链路预算计算器", new LinkBudgetView(), 560, 520);
+    }
+
+    private void openLogWindow() {
+        openToolWindow("日志分析", new LogView(ctx), 1080, 720);
+    }
+
+    private void openToolWindow(String name, javafx.scene.Parent content, double w, double h) {
+        javafx.stage.Stage stage = new javafx.stage.Stage();
+        stage.initOwner(getScene().getWindow());
+        stage.setTitle(name + " · RF Copilot");
+        javafx.scene.Scene scene = new javafx.scene.Scene(content, w, h);
+        scene.getStylesheets().add(
+                Objects.requireNonNull(getClass().getResource("/styles.css")).toExternalForm());
+        stage.setScene(scene);
+        stage.show();
     }
 
     private VBox placeholder(String name, String note) {
@@ -262,30 +299,49 @@ public class MainView extends BorderPane {
         inputArea.setDisable(true);
 
         final ChatSession session = currentSession;
-        ctx.getAgent().chat(session.getId(), text)
-                .onPartialResponse(token -> Platform.runLater(() -> {
-                    sb.append(token);
-                    assistantBubble.setText(sb.toString());
-                    scrollToBottom();
-                }))
-                .onCompleteResponse(response -> Platform.runLater(() -> {
-                    String finalText = !sb.isEmpty()
-                            ? sb.toString()
-                            : (response.aiMessage() != null ? response.aiMessage().text() : "");
-                    assistantBubble.setText(finalText);
-                    session.getMessages().add(new ChatMessageDto(
-                            ChatMessageDto.ROLE_ASSISTANT, finalText, LocalDateTime.now().format(FMT)));
-                    ctx.getSessionStore().save(session);
-                    endStreaming();
-                    refreshSessions();
-                }))
-                .onError(err -> Platform.runLater(() -> {
-                    assistantBubble.getStyleClass().remove("msg-assistant");
-                    assistantBubble.getStyleClass().add("msg-error");
-                    assistantBubble.setText("请求失败：" + err.getMessage());
-                    endStreaming();
-                }))
-                .start();
+        try {
+            ctx.getAgent().chat(session.getId(), text)
+                    .onPartialResponse(token -> Platform.runLater(() -> {
+                        sb.append(token);
+                        assistantBubble.setText(sb.toString());
+                        scrollToBottom();
+                    }))
+                    .onCompleteResponse(response -> Platform.runLater(() -> {
+                        String finalText = !sb.isEmpty()
+                                ? sb.toString()
+                                : (response.aiMessage() != null ? response.aiMessage().text() : "");
+                        assistantBubble.setText(finalText);
+                        session.getMessages().add(new ChatMessageDto(
+                                ChatMessageDto.ROLE_ASSISTANT, finalText, LocalDateTime.now().format(FMT)));
+                        try {
+                            ctx.getSessionStore().save(session);
+                            refreshSessions();
+                        } catch (Exception e) {
+                            // 会话保存失败不影响继续使用，仅在气泡下方追加提示
+                            showSaveWarning();
+                        } finally {
+                            endStreaming();
+                        }
+                    }))
+                    .onError(err -> Platform.runLater(() -> {
+                        assistantBubble.getStyleClass().remove("msg-assistant");
+                        assistantBubble.getStyleClass().add("msg-error");
+                        assistantBubble.setText("请求失败：" + err.getMessage());
+                        endStreaming();
+                    }))
+                    .start();
+        } catch (Exception e) {
+            assistantBubble.getStyleClass().remove("msg-assistant");
+            assistantBubble.getStyleClass().add("msg-error");
+            assistantBubble.setText("请求失败：" + e.getMessage());
+            endStreaming();
+        }
+    }
+
+    private void showSaveWarning() {
+        Label warn = new Label("（注意：会话历史保存失败，重启后将丢失本次记录）");
+        warn.getStyleClass().add("tool-note");
+        chatBox.getChildren().add(warn);
     }
 
     private void endStreaming() {
