@@ -149,9 +149,16 @@ public class MainView extends BorderPane {
 
         sendButton.getStyleClass().add("send-btn");
         sendButton.setOnAction(e -> send());
+        // 发送按钮与输入框等高，宽度按初始宽:高比例（约 2:1）同步缩放
+        double sendBtnRatio = 2.0;
+        sendButton.minHeightProperty().bind(inputArea.heightProperty());
+        sendButton.maxHeightProperty().bind(inputArea.heightProperty());
+        sendButton.prefWidthProperty().bind(sendButton.heightProperty().multiply(sendBtnRatio));
+        sendButton.minWidthProperty().bind(sendButton.prefWidthProperty());
+        sendButton.maxWidthProperty().bind(sendButton.prefWidthProperty());
         HBox.setHgrow(inputArea, Priority.ALWAYS);
         HBox inputRow = new HBox(10, inputArea, sendButton);
-        inputRow.setAlignment(Pos.BOTTOM_RIGHT);
+        inputRow.setAlignment(Pos.CENTER_RIGHT);
         inputRow.setPadding(new Insets(10, 24, 16, 24));
 
         VBox center = new VBox(header, scrollPane, inputRow);
