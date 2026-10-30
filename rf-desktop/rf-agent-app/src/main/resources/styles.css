@@ -170,9 +170,30 @@
     -fx-background-color: -msg-user;
 }
 
+/* 聊天气泡（只读文本区）：去掉文本区自身边框/底色，露出 .msg 气泡背景 */
+.msg-ta,
+.msg-ta .content {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.msg-ta {
+    -fx-cursor: text;
+}
+
+.msg-ta .text {
+    -fx-fill: -fg;
+}
+
 .msg-error {
     -fx-background-color: -msg-error-bg;
     -fx-text-fill: -msg-error-fg;
+}
+
+.msg-error .text {
+    -fx-fill: -msg-error-fg;
 }
 
 .input-area {

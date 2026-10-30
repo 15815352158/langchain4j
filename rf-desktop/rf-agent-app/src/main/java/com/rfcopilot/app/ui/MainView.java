@@ -191,7 +191,7 @@ public class MainView extends BorderPane {
             return;
         }
         String pending = inputArea.getText().strip();
-        Label status = addBubble("msg-assistant", "正在向量化 " + supported.size() + " 个文件…");
+        var status = addBubble("msg-assistant", "正在向量化 " + supported.size() + " 个文件…");
         new Thread(() -> {
             StringBuilder report = new StringBuilder();
             if (!rejected.isEmpty()) {
@@ -354,7 +354,7 @@ public class MainView extends BorderPane {
         addBubble("msg-user", text);
         inputArea.clear();
 
-        Label assistantBubble = addBubble("msg-assistant", "思考中…");
+        var assistantBubble = addBubble("msg-assistant", "思考中…");
         StringBuilder sb = new StringBuilder();
         streaming = true;
         sendButton.setDisable(true);
@@ -412,16 +412,35 @@ public class MainView extends BorderPane {
         inputArea.setDisable(false);
     }
 
-    private Label addBubble(String styleClass, String text) {
-        Label label = new Label(text);
-        label.getStyleClass().addAll("msg", styleClass);
-        label.setWrapText(true);
-        label.setMaxWidth(780);
-        HBox row = new HBox(label);
+    /** 气泡用只读 TextArea 实现：支持鼠标框选与 Ctrl+C 复制，高度随内容自适应 */
+    private TextArea addBubble(String styleClass, String text) {
+        TextArea ta = new TextArea(text);
+        ta.setEditable(false);
+        ta.setWrapText(true);
+        ta.getStyleClass().addAll("msg", styleClass, "msg-ta");
+        ta.setMaxWidth(780);
+        ta.textProperty().addListener((o, a, b) -> autoGrow(ta));
+        ta.widthProperty().addListener((o, a, b) -> autoGrow(ta));
+        HBox row = new HBox(ta);
         row.setAlignment(Pos.CENTER_LEFT);
         chatBox.getChildren().add(row);
+        autoGrow(ta);
         scrollToBottom();
-        return label;
+        return ta;
+    }
+
+    /** 按文本行数与当前宽度估算所需显示行高 */
+    private void autoGrow(TextArea ta) {
+        double usable = (ta.getWidth() > 80 ? ta.getWidth() : 740) - 44;
+        int rows = 0;
+        for (String line : ta.getText().split("\n", -1)) {
+            double lineWidth = 0;
+            for (char ch : line.toCharArray()) {
+                lineWidth += ch > 0x2E7F ? 14 : 8; // 中文按全宽、西文按半宽估算
+            }
+            rows += Math.max(1, (int) Math.ceil(lineWidth / usable));
+        }
+        ta.setPrefRowCount(Math.min(rows + 1, 500));
     }
 
     private void scrollToBottom() {

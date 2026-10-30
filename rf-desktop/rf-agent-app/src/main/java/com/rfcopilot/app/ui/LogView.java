@@ -59,8 +59,19 @@ public class LogView extends BorderPane {
         analyzeBtn.setDisable(true);
         analyzeBtn.setOnAction(e -> analyze());
 
+        Button copyBtn = new Button("复制结果");
+        copyBtn.setOnAction(e -> {
+            javafx.scene.input.Clipboard.getSystemClipboard().setContent(java.util.Map.of(
+                    javafx.scene.input.DataFormat.PLAIN_TEXT, aiResult.getText()));
+            copyBtn.setText("已复制");
+            javafx.animation.PauseTransition p = new javafx.animation.PauseTransition(
+                    javafx.util.Duration.millis(900));
+            p.setOnFinished(x -> copyBtn.setText("复制结果"));
+            p.play();
+        });
+
         statsLabel.getStyleClass().add("tool-note");
-        HBox box = new HBox(12, openBtn, analyzeBtn, statsLabel);
+        HBox box = new HBox(12, openBtn, analyzeBtn, copyBtn, statsLabel);
         box.setPadding(new Insets(10, 16, 10, 16));
         box.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
         box.getStyleClass().add("chat-header");
