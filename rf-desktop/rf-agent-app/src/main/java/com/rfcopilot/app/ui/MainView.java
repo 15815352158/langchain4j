@@ -192,8 +192,12 @@ public class MainView extends BorderPane {
         l2.getStyleClass().add("tool-note");
         l2.setWrapText(true);
         Button open = new Button("打开");
+        open.getStyleClass().add("tool-open");
         open.setOnAction(e -> action.run());
-        VBox box = new VBox(6, l1, l2, open);
+        HBox head = new HBox(10, l1, open);
+        head.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        HBox.setHgrow(l1, javafx.scene.layout.Priority.ALWAYS);
+        VBox box = new VBox(8, head, l2);
         box.getStyleClass().add("tool-card");
         return box;
     }

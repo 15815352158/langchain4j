@@ -166,8 +166,33 @@
 
 .tool-card {
     -fx-background-color: #222222;
-    -fx-background-radius: 8;
-    -fx-padding: 10 12;
+    -fx-background-radius: 10;
+    -fx-border-color: #2e2e2e;
+    -fx-border-radius: 10;
+    -fx-padding: 12 14;
+}
+
+.tool-card:hover {
+    -fx-background-color: #262626;
+    -fx-border-color: #3d6b5c;
+}
+
+/* 工具卡片"打开"按钮：描边胶囊，悬停填充品牌绿 */
+.tool-panel .button.tool-open {
+    -fx-background-color: transparent;
+    -fx-border-color: #10a37f;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-text-fill: #4fd1a5;
+    -fx-font-size: 12px;
+    -fx-padding: 4 16;
+    -fx-cursor: hand;
+}
+
+.tool-panel .button.tool-open:hover {
+    -fx-background-color: #10a37f;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #0d8a6b;
 }
 
 .tool-name {
@@ -283,4 +308,86 @@
 .dialog-pane .button:default {
     -fx-background-color: #10a37f;
     -fx-text-fill: #ffffff;
+}
+
+/* ---------- 全局深色滚动条 ---------- */
+
+.scroll-bar {
+    -fx-background-color: #1b1b1b;
+}
+
+.scroll-bar .track {
+    -fx-background-color: #181818;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #3a3a3a;
+    -fx-background-radius: 6;
+}
+
+.scroll-bar .thumb:hover,
+.scroll-bar .thumb:pressed {
+    -fx-background-color: #4fd1a5;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 2;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-background-color: #6a6a6a;
+    -fx-padding: 2;
+}
+
+/* ---------- 表格（日志/知识库等窗口共用） ---------- */
+
+.table-view {
+    -fx-background-color: #1f1f1f;
+    -fx-border-color: #2e2e2e;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #262626;
+    -fx-background-radius: 8 8 0 0;
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #333333 transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #bfbfbf;
+    -fx-font-weight: bold;
+}
+
+.table-view .table-cell {
+    -fx-text-fill: #dcdcdc;
+    -fx-border-color: transparent;
+}
+
+.table-row-cell {
+    -fx-background-color: #1f1f1f;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #262626;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #2f3b44;
+}
+
+.table-view .placeholder {
+    -fx-background-color: transparent;
+}
+
+.table-view .placeholder .label {
+    -fx-text-fill: #8a8a8a;
 }
