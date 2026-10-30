@@ -52,7 +52,8 @@ public class KnowledgeBase {
 
     /** 支持的文件扩展名 */
     public static final Set<String> SUPPORTED_EXTENSIONS =
-            Set.of("pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "md", "markdown", "txt");
+            Set.of("pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "md", "markdown", "txt",
+                    "log", "s1p", "s2p", "s3p", "s4p");
 
     private final Path vectorsFile = RfPaths.knowledgeDir().resolve("vectors.json");
     private final Path manifestFile = RfPaths.knowledgeDir().resolve("manifest.json");
@@ -220,7 +221,7 @@ public class KnowledgeBase {
             case "pdf" -> new ApachePdfBoxDocumentParser();
             case "doc", "docx", "xls", "xlsx", "ppt", "pptx" -> new ApachePoiDocumentParser();
             case "md", "markdown" -> new MarkdownDocumentParser();
-            case "txt" -> new TextDocumentParser();
+            case "txt", "log", "s1p", "s2p", "s3p", "s4p" -> new TextDocumentParser();
             default -> throw new IllegalArgumentException("不支持的文件类型：" + file);
         };
     }

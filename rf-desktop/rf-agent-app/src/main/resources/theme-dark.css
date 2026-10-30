@@ -1,0 +1,27 @@
+/* 深色主题（默认） */
+.root {
+    -bg: #141414;
+    -bg-alt: #1b1b1b;
+    -card: #222222;
+    -card-alt: #1f1f1f;
+    -hover: #262626;
+    -selected: #303030;
+    -border: #2e2e2e;
+    -border-strong: #3a3a3a;
+    -fg: #e8e8e8;
+    -fg-dim: #8a8a8a;
+    -fg-strong: #ffffff;
+    -accent: #10a37f;
+    -accent-dark: #0d8a6b;
+    -accent-light: #4fd1a5;
+    -input-bg: #f2f2f2;
+    -input-fg: #000000;
+    -input-prompt: #666666;
+    -msg-user: #24333b;
+    -msg-error-bg: #3d2222;
+    -msg-error-fg: #ff9d9d;
+    -term-bg: #1a1a1a;
+    -term-fg: #d8d8d8;
+    -thumb: #3a3a3a;
+    -thumb-hover: #4fd1a5;
+}

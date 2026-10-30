@@ -1,0 +1,27 @@
+/* 护眼绿主题 */
+.root {
+    -bg: #dbe7d8;
+    -bg-alt: #cfdcc9;
+    -card: #e6efe1;
+    -card-alt: #e9f1e6;
+    -hover: #d0dfca;
+    -selected: #bcd6b4;
+    -border: #b9c9b0;
+    -border-strong: #a3b59a;
+    -fg: #263a2a;
+    -fg-dim: #5c6f58;
+    -fg-strong: #122013;
+    -accent: #2e8b57;
+    -accent-dark: #24704a;
+    -accent-light: #2e8b57;
+    -input-bg: #f2f7ee;
+    -input-fg: #223022;
+    -input-prompt: #8a9a86;
+    -msg-user: #c8e2c4;
+    -msg-error-bg: #f3d3c8;
+    -msg-error-fg: #a03a20;
+    -term-bg: #2a322a;
+    -term-fg: #e0ead8;
+    -thumb: #a9bda1;
+    -thumb-hover: #2e8b57;
+}

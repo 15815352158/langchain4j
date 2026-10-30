@@ -149,22 +149,83 @@ public class MainView extends BorderPane {
 
         sendButton.getStyleClass().add("send-btn");
         sendButton.setOnAction(e -> send());
-        // 发送按钮与输入框等高，宽度按初始宽:高比例（约 2:1）同步缩放
-        double sendBtnRatio = 2.0;
-        sendButton.minHeightProperty().bind(inputArea.heightProperty());
-        sendButton.maxHeightProperty().bind(inputArea.heightProperty());
-        sendButton.prefWidthProperty().bind(sendButton.heightProperty().multiply(sendBtnRatio));
-        sendButton.minWidthProperty().bind(sendButton.prefWidthProperty());
-        sendButton.maxWidthProperty().bind(sendButton.prefWidthProperty());
-        HBox.setHgrow(inputArea, Priority.ALWAYS);
-        HBox inputRow = new HBox(10, inputArea, sendButton);
-        inputRow.setAlignment(Pos.CENTER_RIGHT);
-        inputRow.setPadding(new Insets(10, 24, 16, 24));
+        // 输入框独占整行（右边到垂直滚动条），发送按钮在其下方右对齐
+        HBox btnRow = new HBox(sendButton);
+        btnRow.setAlignment(Pos.TOP_RIGHT);
+        VBox inputCol = new VBox(8, inputArea, btnRow);
+        inputCol.setPadding(new Insets(10, 24, 16, 24));
 
-        VBox center = new VBox(header, scrollPane, inputRow);
+        VBox center = new VBox(header, scrollPane, inputCol);
         center.getStyleClass().add("chat-center");
         BorderPane pane = new BorderPane(center);
+        // 拖拽文件到对话区：先收录向量化，再继续提问
+        pane.setOnDragOver(e -> {
+            if (e.getDragboard().hasFiles()) {
+                e.acceptTransferModes(javafx.scene.input.TransferMode.COPY);
+            }
+        });
+        pane.setOnDragDropped(e -> {
+            if (e.getDragboard().hasFiles()) {
+                handleFileDrop(e.getDragboard().getFiles());
+                e.setDropCompleted(true);
+                e.consume();
+            }
+        });
         return pane;
+    }
+
+    /** 处理拖入的文件：后台收录进知识库，完成后重建检索器；若输入框已有问题则自动发送 */
+    private void handleFileDrop(java.util.List<java.io.File> files) {
+        var supported = new java.util.ArrayList<java.io.File>();
+        var rejected = new java.util.ArrayList<java.io.File>();
+        for (var f : files) {
+            if (com.rfcopilot.knowledge.KnowledgeBase.isSupported(f.toPath())) {
+                supported.add(f);
+            } else {
+                rejected.add(f);
+            }
+        }
+        if (supported.isEmpty()) {
+            addBubble("msg-error", "拖入的文件类型都不支持。支持："
+                    + String.join(" ", com.rfcopilot.knowledge.KnowledgeBase.SUPPORTED_EXTENSIONS));
+            return;
+        }
+        String pending = inputArea.getText().strip();
+        Label status = addBubble("msg-assistant", "正在向量化 " + supported.size() + " 个文件…");
+        new Thread(() -> {
+            StringBuilder report = new StringBuilder();
+            if (!rejected.isEmpty()) {
+                report.append("不支持已跳过：")
+                        .append(rejected.stream().map(java.io.File::getName)
+                                .collect(java.util.stream.Collectors.joining("、")))
+                        .append('\n');
+            }
+            var profile = ctx.getConfig().embeddingProfile();
+            for (var f : supported) {
+                var p = f.toPath();
+                String name = f.getName();
+                try {
+                    if (ctx.getKnowledgeBase().contains(p)) {
+                        report.append("《").append(name).append("》已在知识库中\n");
+                        continue;
+                    }
+                    int chunks = ctx.getKnowledgeBase().importFile(p, profile,
+                            msg -> Platform.runLater(() -> status.setText("正在向量化《" + name + "》：" + msg)));
+                    report.append("已收录《").append(name).append("》，共 ").append(chunks).append(" 个片段\n");
+                } catch (Throwable ex) {
+                    report.append("《").append(name).append("》收录失败：").append(ex.getMessage()).append('\n');
+                }
+            }
+            Platform.runLater(() -> {
+                ctx.rebuildAgent();
+                updateModelLabel();
+                status.setText(report.toString().strip());
+                scrollToBottom();
+                if (!pending.isEmpty() && !streaming) {
+                    send();
+                }
+            });
+        }, "kb-drop-import").start();
     }
 
     // ---------- 右侧工具面板（占位） ----------
@@ -227,8 +288,7 @@ public class MainView extends BorderPane {
         stage.initOwner(getScene().getWindow());
         stage.setTitle(name + " · RF Copilot");
         javafx.scene.Scene scene = new javafx.scene.Scene(content, w, h);
-        scene.getStylesheets().add(
-                Objects.requireNonNull(getClass().getResource("/styles.css")).toExternalForm());
+        com.rfcopilot.app.ThemeManager.apply(scene);
         stage.setScene(scene);
         stage.show();
     }

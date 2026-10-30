@@ -1,37 +1,94 @@
-/* RF Copilot 深色主题（仿 Codex 桌面版） */
+/* RF Copilot 主题基架：所有颜色引用 -xxx 变量，由 theme-*.css 定义 */
 
 .root {
-    -fx-background-color: #141414;
+    -fx-background-color: -bg;
     -fx-font-family: "Microsoft YaHei UI", "Segoe UI", sans-serif;
     -fx-font-size: 14px;
 }
 
 .label {
-    -fx-text-fill: #e8e8e8;
+    -fx-text-fill: -fg;
+}
+
+/* 通用按钮默认样式（更具体的类如 send-btn/tool-open 在后面定义，会覆盖此处） */
+.button {
+    -fx-background-color: -card;
+    -fx-text-fill: -fg;
+    -fx-background-radius: 6;
+    -fx-padding: 8 12;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: -hover;
+}
+
+.button:disabled {
+    -fx-opacity: 0.55;
+}
+
+/* 通用文本区（AI 分析结果等） */
+.text-area {
+    -fx-background-color: -card-alt, -border, -card-alt;
+    -fx-background-insets: 0, 0, 1;
+    -fx-text-fill: -fg;
+    -fx-highlight-fill: -accent;
+    -fx-background-radius: 8;
+}
+
+.text-area .content {
+    -fx-background-color: -card-alt;
+}
+
+.text-area:focused {
+    -fx-background-color: -accent, -accent, -card-alt;
+}
+
+/* 通用列表（知识库文件列表等） */
+.list-view {
+    -fx-background-color: -card-alt;
+    -fx-background-radius: 8;
+    -fx-border-color: -border;
+    -fx-border-radius: 8;
+}
+
+.list-view .list-cell {
+    -fx-background-color: -card-alt;
+    -fx-text-fill: -fg;
+    -fx-padding: 6 10;
+}
+
+.list-view .list-cell:hover {
+    -fx-background-color: -hover;
+}
+
+.list-view .list-cell:filled:selected {
+    -fx-background-color: -selected;
+    -fx-text-fill: -fg-strong;
 }
 
 /* ---------- 左侧栏 ---------- */
 
 .sidebar {
-    -fx-background-color: #1b1b1b;
-    -fx-border-color: transparent #2a2a2a transparent transparent;
+    -fx-background-color: -bg-alt;
+    -fx-border-color: transparent -border transparent transparent;
 }
 
 .logo {
     -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-text-fill: #4fd1a5;
+    -fx-text-fill: -accent-light;
 }
 
 .section-title {
     -fx-font-size: 12px;
-    -fx-text-fill: #9a9a9a;
+    -fx-text-fill: -fg-dim;
 }
 
 .sidebar .button,
 .tool-panel .button {
-    -fx-background-color: #2a2a2a;
-    -fx-text-fill: #e0e0e0;
+    -fx-background-color: -card;
+    -fx-text-fill: -fg;
     -fx-background-radius: 6;
     -fx-padding: 8 12;
     -fx-cursor: hand;
@@ -39,17 +96,17 @@
 
 .sidebar .button:hover,
 .tool-panel .button:hover {
-    -fx-background-color: #383838;
+    -fx-background-color: -hover;
 }
 
 .sidebar-primary {
-    -fx-background-color: #10a37f !important;
-    -fx-text-fill: #ffffff !important;
+    -fx-background-color: -accent !important;
+    -fx-text-fill: -fg-strong !important;
     -fx-font-weight: bold;
 }
 
 .sidebar-primary:hover {
-    -fx-background-color: #0d8a6b !important;
+    -fx-background-color: -accent-dark !important;
 }
 
 .session-list,
@@ -61,29 +118,29 @@
 
 .session-list .list-cell {
     -fx-background-color: transparent;
-    -fx-text-fill: #cfcfcf;
+    -fx-text-fill: -fg;
     -fx-padding: 8 10;
     -fx-background-radius: 6;
 }
 
 .session-list .list-cell:hover {
-    -fx-background-color: #262626;
+    -fx-background-color: -hover;
 }
 
 .session-list .list-cell:selected {
-    -fx-background-color: #303030;
-    -fx-text-fill: #ffffff;
+    -fx-background-color: -selected;
+    -fx-text-fill: -fg-strong;
 }
 
 /* ---------- 对话区 ---------- */
 
 .chat-center {
-    -fx-background-color: #141414;
+    -fx-background-color: -bg;
 }
 
 .chat-header {
-    -fx-background-color: #141414;
-    -fx-border-color: transparent transparent #242424 transparent;
+    -fx-background-color: -bg;
+    -fx-border-color: transparent transparent -border transparent;
 }
 
 .header-title {
@@ -93,7 +150,7 @@
 
 .header-model {
     -fx-font-size: 12px;
-    -fx-text-fill: #8a8a8a;
+    -fx-text-fill: -fg-dim;
 }
 
 .chat-scroll,
@@ -103,45 +160,45 @@
 }
 
 .msg {
-    -fx-background-color: #1f1f1f;
+    -fx-background-color: -card-alt;
     -fx-background-radius: 10;
     -fx-padding: 12 16;
-    -fx-text-fill: #e8e8e8;
+    -fx-text-fill: -fg;
 }
 
 .msg-user {
-    -fx-background-color: #24333b;
+    -fx-background-color: -msg-user;
 }
 
 .msg-error {
-    -fx-background-color: #3d2222;
-    -fx-text-fill: #ff9d9d;
+    -fx-background-color: -msg-error-bg;
+    -fx-text-fill: -msg-error-fg;
 }
 
 .input-area {
-    -fx-background-color: #f2f2f2;
+    -fx-background-color: -input-bg;
     -fx-background-radius: 10;
-    -fx-text-fill: #000000;
-    -fx-prompt-text-fill: #666666;
+    -fx-text-fill: -input-fg;
+    -fx-prompt-text-fill: -input-prompt;
     -fx-font-size: 14px;
 }
 
 .input-area .content {
-    -fx-background-color: #f2f2f2;
+    -fx-background-color: -input-bg;
     -fx-background-radius: 10;
 }
 
 .input-area .content .text {
-    -fx-fill: #000000;
+    -fx-fill: -input-fg;
 }
 
 .input-area:focused {
-    -fx-background-color: #10a37f, #f2f2f2;
+    -fx-background-color: -accent, -input-bg;
 }
 
 .send-btn {
-    -fx-background-color: #10a37f;
-    -fx-text-fill: #ffffff;
+    -fx-background-color: -accent;
+    -fx-text-fill: -fg-strong;
     -fx-font-weight: bold;
     -fx-background-radius: 10;
     -fx-padding: 10 24;
@@ -149,185 +206,219 @@
 }
 
 .send-btn:hover {
-    -fx-background-color: #0d8a6b;
+    -fx-background-color: -accent-dark;
 }
 
 .send-btn:disabled {
-    -fx-background-color: #2a2a2a;
-    -fx-text-fill: #777777;
+    -fx-background-color: -card;
+    -fx-text-fill: -fg-dim;
 }
 
 /* ---------- 右侧工具面板 ---------- */
 
 .tool-panel {
-    -fx-background-color: #1b1b1b;
-    -fx-border-color: transparent #2a2a2a transparent transparent;
+    -fx-background-color: -bg-alt;
+    -fx-border-color: transparent -border transparent transparent;
 }
 
 .tool-card {
-    -fx-background-color: #222222;
+    -fx-background-color: -card;
     -fx-background-radius: 10;
-    -fx-border-color: #2e2e2e;
+    -fx-border-color: -border;
     -fx-border-radius: 10;
     -fx-padding: 12 14;
 }
 
 .tool-card:hover {
-    -fx-background-color: #262626;
-    -fx-border-color: #3d6b5c;
+    -fx-background-color: -hover;
+    -fx-border-color: -accent-dark;
 }
 
-/* 工具卡片"打开"按钮：描边胶囊，悬停填充品牌绿 */
+/* 工具卡片"打开"按钮：描边胶囊，悬停填充品牌色 */
 .tool-panel .button.tool-open {
     -fx-background-color: transparent;
-    -fx-border-color: #10a37f;
+    -fx-border-color: -accent;
     -fx-border-radius: 12;
     -fx-background-radius: 12;
-    -fx-text-fill: #4fd1a5;
+    -fx-text-fill: -accent-light;
     -fx-font-size: 12px;
     -fx-padding: 4 16;
     -fx-cursor: hand;
 }
 
 .tool-panel .button.tool-open:hover {
-    -fx-background-color: #10a37f;
-    -fx-text-fill: #ffffff;
-    -fx-border-color: #0d8a6b;
+    -fx-background-color: -accent;
+    -fx-text-fill: -fg-strong;
+    -fx-border-color: -accent-dark;
 }
 
 .tool-name {
     -fx-font-weight: bold;
-    -fx-text-fill: #dcdcdc;
+    -fx-text-fill: -fg;
 }
 
 .tool-note {
     -fx-font-size: 12px;
-    -fx-text-fill: #8a8a8a;
+    -fx-text-fill: -fg-dim;
 }
 
 .check-box {
-    -fx-text-fill: #e0e0e0;
+    -fx-text-fill: -fg;
 }
 
 /* ---------- SCPI 终端 ---------- */
 
 .scpi-log,
 .scpi-log .content {
-    -fx-background-color: #1a1a1a;
+    -fx-background-color: -term-bg;
     -fx-background-radius: 8;
 }
 
 .scpi-log {
-    -fx-text-fill: #d8d8d8;
+    -fx-text-fill: -term-fg;
     -fx-font-family: "Consolas", "JetBrains Mono", monospace;
     -fx-font-size: 13px;
     -fx-padding: 8;
 }
 
-/* 链路预算结果滚动区：透明底，融入深色主题 */
+/* 链路预算结果滚动区：透明底，融入主题 */
 .link-result-scroll,
 .link-result-scroll > .viewport {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
 }
 
-/* SCPI 快捷命令按钮（深色背景，避免浅字浅底） */
+/* SCPI 快捷命令按钮 */
 .quick-btn {
-    -fx-background-color: #2a2a2a;
-    -fx-text-fill: #e0e0e0;
+    -fx-background-color: -card;
+    -fx-text-fill: -fg;
     -fx-background-radius: 6;
     -fx-padding: 6 10;
     -fx-cursor: hand;
 }
 
 .quick-btn:hover {
-    -fx-background-color: #383838;
+    -fx-background-color: -hover;
 }
 
 /* ---------- 对话框 ---------- */
 
 .dialog-pane {
-    -fx-background-color: #1e1e1e;
+    -fx-background-color: -card;
 }
 
 .dialog-pane .label {
-    -fx-text-fill: #e0e0e0;
+    -fx-text-fill: -fg;
 }
 
 .dialog-pane:header .header-panel {
-    -fx-background-color: #262626;
+    -fx-background-color: -card-alt;
 }
 
 .text-field,
 .combo-box {
-    -fx-background-color: #2a2a2a;
-    -fx-text-fill: #e8e8e8;
+    -fx-background-color: -card;
+    -fx-text-fill: -fg;
     -fx-background-radius: 6;
-    -fx-border-color: #3a3a3a;
+    -fx-border-color: -border-strong;
     -fx-border-radius: 6;
 }
 
 .text-field:focused,
 .combo-box:focused {
-    -fx-border-color: #10a37f;
+    -fx-border-color: -accent;
 }
 
 .combo-box .list-cell {
     -fx-background-color: transparent;
-    -fx-text-fill: #e8e8e8;
+    -fx-text-fill: -fg;
 }
 
 .combo-box-popup .list-view {
-    -fx-background-color: #2a2a2a;
+    -fx-background-color: -card;
 }
 
 .combo-box-popup .list-cell {
-    -fx-background-color: #2a2a2a;
-    -fx-text-fill: #e0e0e0;
+    -fx-background-color: -card;
+    -fx-text-fill: -fg;
 }
 
 .combo-box-popup .list-cell:hover {
-    -fx-background-color: #383838;
+    -fx-background-color: -hover;
 }
 
 .button .text,
 .dialog-pane .button {
-    -fx-fill: #e0e0e0;
+    -fx-fill: -fg;
 }
 
 .dialog-pane .button {
-    -fx-background-color: #333333;
-    -fx-text-fill: #e0e0e0;
+    -fx-background-color: -card-alt;
+    -fx-text-fill: -fg;
     -fx-background-radius: 6;
 }
 
 .dialog-pane .button:hover {
-    -fx-background-color: #3e3e3e;
+    -fx-background-color: -hover;
 }
 
 .dialog-pane .button:default {
-    -fx-background-color: #10a37f;
-    -fx-text-fill: #ffffff;
+    -fx-background-color: -accent;
+    -fx-text-fill: -fg-strong;
 }
 
-/* ---------- 全局深色滚动条 ---------- */
+/* ---------- 菜单栏 ---------- */
+
+.menu-bar {
+    -fx-background-color: -bg-alt;
+    -fx-border-color: transparent transparent -border transparent;
+}
+
+.menu-bar .label {
+    -fx-text-fill: -fg;
+}
+
+.menu-bar .menu .label:hover {
+    -fx-text-fill: -accent-light;
+}
+
+.context-menu {
+    -fx-background-color: -card;
+    -fx-background-radius: 6;
+}
+
+.context-menu .label {
+    -fx-text-fill: -fg;
+}
+
+.menu-item:hover,
+.radio-menu-item:hover {
+    -fx-background-color: -hover;
+}
+
+.radio-menu-item:checked .radio {
+    -fx-background-color: -accent;
+    -fx-mark-color: -fg-strong;
+}
+
+/* ---------- 全局滚动条 ---------- */
 
 .scroll-bar {
-    -fx-background-color: #1b1b1b;
+    -fx-background-color: -bg-alt;
 }
 
 .scroll-bar .track {
-    -fx-background-color: #181818;
+    -fx-background-color: -bg;
 }
 
 .scroll-bar .thumb {
-    -fx-background-color: #3a3a3a;
+    -fx-background-color: -thumb;
     -fx-background-radius: 6;
 }
 
 .scroll-bar .thumb:hover,
 .scroll-bar .thumb:pressed {
-    -fx-background-color: #4fd1a5;
+    -fx-background-color: -thumb-hover;
 }
 
 .scroll-bar .increment-button,
@@ -338,50 +429,50 @@
 
 .scroll-bar .increment-arrow,
 .scroll-bar .decrement-arrow {
-    -fx-background-color: #6a6a6a;
+    -fx-background-color: -fg-dim;
     -fx-padding: 2;
 }
 
-/* ---------- 表格（日志/知识库等窗口共用） ---------- */
+/* ---------- 表格 ---------- */
 
 .table-view {
-    -fx-background-color: #1f1f1f;
-    -fx-border-color: #2e2e2e;
+    -fx-background-color: -card-alt;
+    -fx-border-color: -border;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
 }
 
 .table-view .column-header-background {
-    -fx-background-color: #262626;
+    -fx-background-color: -hover;
     -fx-background-radius: 8 8 0 0;
 }
 
 .table-view .column-header,
 .table-view .filler {
     -fx-background-color: transparent;
-    -fx-border-color: transparent transparent #333333 transparent;
+    -fx-border-color: transparent transparent -border-strong transparent;
 }
 
 .table-view .column-header .label {
-    -fx-text-fill: #bfbfbf;
+    -fx-text-fill: -fg-dim;
     -fx-font-weight: bold;
 }
 
 .table-view .table-cell {
-    -fx-text-fill: #dcdcdc;
+    -fx-text-fill: -fg;
     -fx-border-color: transparent;
 }
 
 .table-row-cell {
-    -fx-background-color: #1f1f1f;
+    -fx-background-color: -card-alt;
 }
 
 .table-row-cell:hover {
-    -fx-background-color: #262626;
+    -fx-background-color: -hover;
 }
 
 .table-row-cell:selected {
-    -fx-background-color: #2f3b44;
+    -fx-background-color: -selected;
 }
 
 .table-view .placeholder {
@@ -389,5 +480,5 @@
 }
 
 .table-view .placeholder .label {
-    -fx-text-fill: #8a8a8a;
+    -fx-text-fill: -fg-dim;
 }

@@ -11,6 +11,7 @@ public class AppConfig {
     private String activeProfileId;
     /** 知识库嵌入使用的档位 id；为空时跟随当前激活档位 */
     private String embeddingProfileId;
+    private String theme = "DARK";
     private List<ModelProfile> profiles = new ArrayList<>();
 
     public AppConfig() {
@@ -76,6 +77,14 @@ public class AppConfig {
 
     public void setEmbeddingProfileId(String embeddingProfileId) {
         this.embeddingProfileId = embeddingProfileId;
+    }
+
+    public String getTheme() {
+        return theme;
+    }
+
+    public void setTheme(String theme) {
+        this.theme = theme;
     }
 
     public List<ModelProfile> getProfiles() {
